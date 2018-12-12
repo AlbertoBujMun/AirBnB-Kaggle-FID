@@ -1,0 +1,17 @@
+-- Cleaning -- 
+https://www.kaggle.com/nikhiljangam/exploratory-data-analysis
+
+https://www.kaggle.com/meldaozdin/plotly-library-beginner-level
+
+https://www.kaggle.com/roydatascience/airbnb-new-user-booking-random-forest
+
+https://www.kaggle.com/shaynarh/airbnb-cleaning-and-first-look-data
+
+https://www.kaggle.com/lenkiii/my-first-python-notebook-some-data-cleaning
+
+https://www.kaggle.com/mnshrs/data-cleaning
+
+-- others --
+https://www.kaggle.com/foutik/script-cleaning-data
+
+https://www.datacamp.com/community/tutorials/recommender-systems-python
