@@ -6,6 +6,7 @@ from wordcloud import WordCloud
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
+from scipy import stats
 
 # Inspect available files
 list_resources_directory = os.listdir('lib')
@@ -43,6 +44,23 @@ train = train.drop(['timestamp_first_active'], axis=1)
 ten_first = train.head(10)
 
 # ------------------------ Gender study by removing -unknown- gender tuples ------------------------
+gender_distribution = sns.countplot(train['gender'], palette="deep")
+plt.savefig('charts and diagrams/genderdistribution.png')
+
+# there is any trend in destinations in users who put unknown as their gender?
+unknown_gender = train.loc[train.gender == '-unknown-', 'country_destination'].value_counts().sum()
+unknown_gender_countries = train.loc[train.gender == '-unknown-', 'country_destination'].value_counts() / (
+        100 * unknown_gender)
+
+known_gender = train.loc[train.gender != '-unknown-', 'country_destination'].value_counts().sum()
+known_gender_countries = train.loc[train.gender != '-unknown-', 'country_destination'].value_counts() / (
+        100 * unknown_gender)
+
+compared_known_and_unknown_genders = pd.concat([unknown_gender_countries, known_gender_countries], axis=1)
+compared_known_and_unknown_genders.columns = ['unknown_gender countries', 'known_genders countries']
+
+# So, individuals who do not indicate gender, did not book a trip
+
 data = train[(train.gender == "MALE") | (train.gender == "FEMALE")]
 ten_first_data = data.head(10)
 
@@ -68,6 +86,8 @@ x2013_values = data.country_destination[data.date_account_created == 2013].value
 x2014_values = data.country_destination[data.date_account_created == 2014].value_counts()
 
 # ------------------------ Distribution by age per year ------------------------
+age_info = stats.describe(data['age'])
+
 x2010 = data[data.date_account_created == 2010]
 x2011 = data[data.date_account_created == 2011]
 x2012 = data[data.date_account_created == 2012]
@@ -78,7 +98,15 @@ plt.figure()
 plt.boxplot([x2010.age, x2011.age, x2012.age, x2013.age, x2014.age])
 plt.savefig('charts and diagrams/agesdistribution.png')
 
-# ------------------------ Removing the upper outliers ------------------------
+age_plot = sns.countplot(data['age'])
+for ind, label in enumerate(age_plot.get_xticklabels()):
+    if ind % 15 == 0:
+        label.set_visible(True)
+    else:
+        label.set_visible(False)
+plt.savefig('charts and diagrams/ageshistogram.png')
+
+# ------------------------ Removing the outliers ------------------------
 
 p1 = np.percentile(x2010.age, [5, 95])
 p2 = np.percentile(x2011.age, [5, 95])
