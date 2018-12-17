@@ -1,8 +1,5 @@
 import numpy as np
 import pandas as pd
-import plotly.plotly as py
-import plotly.graph_objs as go
-from wordcloud import WordCloud
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
@@ -61,6 +58,24 @@ compared_known_and_unknown_genders.columns = ['unknown_gender countries', 'known
 
 # So, individuals who do not indicate gender, did not book a trip
 
+# working with clean gender dataset
+# there is any trend in destinations in users who put male/female as their gender?
+female = train.loc[train['gender'] == 'FEMALE', 'country_destination'].value_counts().sum()
+male = train.loc[train['gender'] == 'MALE', 'country_destination'].value_counts().sum()
+
+female_destinations = train.loc[train['gender'] == 'FEMALE', 'country_destination'].value_counts() / female * 100
+male_destinations = train.loc[train['gender'] == 'MALE', 'country_destination'].value_counts() / male * 100
+
+male_female_destinations_trend = pd.concat([female_destinations, male_destinations], axis=1, sort=False)
+male_female_destinations_trend.columns = ['Female', 'Male']
+
+male_female_destinations_trend_barschart = male_female_destinations_trend.plot.bar(colormap='jet',
+                                                                                   title='Percentage of Gender Per Destination')
+male_female_destinations_trend_barschart.set_xlabel('Country Destination')
+male_female_destinations_trend_barschart.set_ylabel('Percentage')
+
+plt.savefig('charts and diagrams/destinationspergender.png')
+
 data = train[(train.gender == "MALE") | (train.gender == "FEMALE")]
 ten_first_data = data.head(10)
 
@@ -72,18 +87,23 @@ gender_percentage2012 = data.gender[data.date_account_created == 2012].value_cou
 gender_percentage2013 = data.gender[data.date_account_created == 2013].value_counts() / data.shape[0] * 100
 gender_percentage2014 = data.gender[data.date_account_created == 2014].value_counts() / data.shape[0] * 100
 
-print("Gender percentage 2010: \n", gender_percentage2010, "\n")
-print("Gender percentage 2011: \n", gender_percentage2011, "\n")
-print("Gender percentage 2012: \n", gender_percentage2012, "\n")
-print("Gender percentage 2013: \n", gender_percentage2013, "\n")
-print("Gender percentage 2014: \n", gender_percentage2014, "\n")
+gender_percentages_per_year = pd.concat([gender_percentage2010, gender_percentage2011, gender_percentage2012,
+                                         gender_percentage2013, gender_percentage2014], axis=1)
+gender_percentages_per_year.columns = ['2010', '2011', '2012', '2013', '2014']
 
-# ------------------------ Destination study by years ------------------------
+gender_percentages_per_year_bar = gender_percentages_per_year.plot.bar(colormap='jet')
+plt.savefig('charts and diagrams/populationbytheyears.png')
+
+# ------------------------ Destination study by years  of account creation ------------------------
 x2010_values = data.country_destination[data.date_account_created == 2010].value_counts()
 x2011_values = data.country_destination[data.date_account_created == 2011].value_counts()
 x2012_values = data.country_destination[data.date_account_created == 2012].value_counts()
 x2013_values = data.country_destination[data.date_account_created == 2013].value_counts()
 x2014_values = data.country_destination[data.date_account_created == 2014].value_counts()
+
+destination_aggregation_by_account_creation = pd.concat(
+    [x2010_values, x2011_values, x2012_values, x2013_values, x2014_values], axis=1, sort=False)
+destination_aggregation_by_account_creation.columns = ['2010', '2011', '2012', '2013', '2014']
 
 # ------------------------ Distribution by age per year ------------------------
 age_info = stats.describe(data['age'])
@@ -123,3 +143,9 @@ new_df5 = x2014[(x2014.age > p5[0]) & (x2014.age < p5[1])]
 plt.figure()
 plt.boxplot([new_df1.age, new_df2.age, new_df3.age, new_df4.age, new_df5.age])
 plt.savefig('charts and diagrams/agesdistribution_without_outliers.png')
+
+# ------------------------ Relationships between when the account is created and the first booking date ------------------------
+clean_genderandage_data = pd.concat([new_df1, new_df2, new_df3, new_df4, new_df5])
+
+grouped_create_date = clean_genderandage_data['date_account_created']
+grouped_firstbooking_date = clean_genderandage_data['date_first_booking']
