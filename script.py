@@ -149,3 +149,18 @@ clean_genderandage_data = pd.concat([new_df1, new_df2, new_df3, new_df4, new_df5
 
 grouped_create_date = clean_genderandage_data['date_account_created']
 grouped_firstbooking_date = clean_genderandage_data['date_first_booking']
+
+fig, ax = plt.subplots(1,2, figsize=(20, 7))
+
+sns.countplot((grouped_create_date), ax=ax[0], hue = clean_genderandage_data['country_destination'])
+sns.countplot((grouped_firstbooking_date), ax=ax[1], hue = clean_genderandage_data['country_destination'])
+
+ax[0].set_xlabel('Date of Account Creation')
+ax[0].set_ylabel('Number of Created Accounts')
+ax[0].set_title('Accounts Created')
+
+ax[1].set_xlabel('Date of First Booking')
+ax[1].set_ylabel('Number of Bookings')
+ax[1].set_title('Bookings')
+
+fig.show()
